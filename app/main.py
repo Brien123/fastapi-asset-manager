@@ -45,7 +45,7 @@ def custom_openapi():
         routes=app.routes,
     )
     
-    # Configure both Basic Auth for login and Bearer for other endpoints
+    # Basic Auth for login and Bearer for other endpoints
     openapi_schema["components"]["securitySchemes"] = {
         "BasicAuth": {
             "type": "http",
@@ -60,7 +60,7 @@ def custom_openapi():
         }
     }
     
-    # Add security requirements
+    # security requirements
     for path, path_item in openapi_schema["paths"].items():
         for method, operation in path_item.items():
             if path == "/auth/token" and method == "post":

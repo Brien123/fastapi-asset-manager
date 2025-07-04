@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func, extract
+from sqlalchemy import func
 from datetime import datetime, timedelta
 from app.models import User, Asset, Transaction
 from app.database import get_db
 from app.routers.auth import get_current_user
-from typing import List, Dict, Any
+from typing import Dict, Any
 
 router = APIRouter()
 
@@ -16,7 +16,7 @@ def get_graph_data(
 ) -> Dict[str, Any]:
     # User growth data
     user_growth = db.query(
-        func.date_trunc('day', User.created_at).label("date"),
+        func.strftime('%Y-%m-%d', User.created_at).label("date"),
         func.count(User.id).label("count")
     ).group_by("date").order_by("date").all()
     
@@ -31,7 +31,7 @@ def get_graph_data(
     
     # Transaction volume over time
     transaction_volume = db.query(
-        func.date_trunc('day', Transaction.timestamp).label("date"),
+        func.strftime('%Y-%m-%d', Transaction.timestamp).label("date"),
         func.sum(Transaction.amount).label("volume")
     ).filter(
         Transaction.user_id == current_user.id,

@@ -62,13 +62,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
-    # Keep the form dependency for Swagger UI compatibility
     form_data: OAuth2PasswordRequestForm = Depends(),
-    # Add optional JSON input
     credentials: Optional[UserLogin] = Body(None),
     db: Session = Depends(get_db)
 ):
-    # Use JSON credentials if provided, otherwise fall back to form data
     username = credentials.username if credentials else form_data.username
     password = credentials.password if credentials else form_data.password
     

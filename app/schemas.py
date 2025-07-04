@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Optional, List, Dict
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from app.models import AssetType, TransactionType
 
 class Token(BaseModel):
     access_token: str
@@ -25,7 +26,7 @@ class User(UserBase):
 
 class AssetBase(BaseModel):
     name: str
-    type: str
+    type: AssetType
     value: float
 
 class AssetCreate(AssetBase):
@@ -39,9 +40,23 @@ class Asset(AssetBase):
     class Config:
         orm_mode = True
 
+class PaginatedAssetResponse(BaseModel):
+    total_count: int
+    page: int
+    limit: int
+    has_next_page: bool
+    has_previous_page: bool
+    assets: List[Asset]
+
+class ReportResponse(BaseModel):
+    total_assets: int
+    total_asset_value: float
+    recent_transactions: int
+    transaction_types_distribution: Dict[TransactionType, int]
+
 class TransactionBase(BaseModel):
     amount: float
-    type: str
+    type: TransactionType
     asset_id: int
 
 class TransactionCreate(TransactionBase):
@@ -54,14 +69,7 @@ class Transaction(TransactionBase):
     
     class Config:
         orm_mode = True
-        
-class Token(BaseModel):
-    access_token: str
-    token_type: str
 
-class TokenData(BaseModel):
-    username: Optional[str] = None
-    
 class UserLogin(BaseModel):
     username: str
     password: str
