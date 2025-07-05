@@ -2,16 +2,12 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status, Body
-from fastapi.security import OAuth2PasswordBearer
-from app.schemas import TokenData, UserLogin
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from app.schemas import TokenData, UserLogin, Token
 from app.models import User
 from sqlalchemy.orm import Session
 from app.database import get_db
-from fastapi import APIRouter, status
-from fastapi.security import OAuth2PasswordRequestForm
-from datetime import timedelta
-from app.schemas import Token
 import os
 
 # Security settings
@@ -60,15 +56,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         raise credentials_exception
     return user
 
-@router.post("/token", response_model=Token)
-async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    credentials: Optional[UserLogin] = Body(None),
-    db: Session = Depends(get_db)
-):
-    username = credentials.username if credentials else form_data.username
-    password = credentials.password if credentials else form_data.password
-    
+def _get_token_for_user(username: str, password: str, db: Session):
+    """Helper function to authenticate user and create JWT token."""
     user = db.query(User).filter(User.username == username).first()
     if not user or not verify_password(password, user.hashed_password):
         raise HTTPException(
@@ -84,3 +73,17 @@ async def login_for_access_token(
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/token", response_model=Token, include_in_schema=False)
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    return _get_token_for_user(form_data.username, form_data.password, db)
+
+@router.post("/", response_model=Token)
+async def get_token(
+    credentials: UserLogin,
+    db: Session = Depends(get_db)
+):
+    return _get_token_for_user(credentials.username, credentials.password, db)

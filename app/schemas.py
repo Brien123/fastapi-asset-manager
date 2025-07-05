@@ -24,6 +24,14 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
+class PaginatedUserResponse(BaseModel):
+    total_count: int
+    page: int
+    limit: int
+    has_next_page: bool
+    has_previous_page: bool
+    users: List[User]
+
 class AssetBase(BaseModel):
     name: str
     type: AssetType
