@@ -21,7 +21,9 @@ RUN addgroup --system app && adduser --system --group app
 COPY --from=builder /venv /venv
 
 WORKDIR /app
-COPY --chown=app:app . /app
+COPY . /app
+
+RUN chown -R app:app /app
 
 USER app
 ENV PATH="/venv/bin:$PATH"
