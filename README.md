@@ -70,7 +70,7 @@ cp .env.example .env
 ```
 
 Open the `.env` file and set your `SECRET_KEY`. You can generate a strong secret key using Python:
-`python -c 'import secrets; print(secrets.token_hex(32))'`
+`python -c 'import secrets; print(secrets.token_hex(32))'`. The default key is fine though.
 
 ### 6. Run the Application (Local)
 
