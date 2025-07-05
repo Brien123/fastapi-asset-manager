@@ -32,7 +32,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.get("/", response_model=PaginatedUserResponse)
 def read_users(
     page: int = Query(1, ge=1, description="Page number, starting from 1"),
-    limit: int = Query(100, ge=1, le=200, description="Number of items per page"),
+    limit: int = Query(20, ge=1, le=200, description="Number of items per page"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
