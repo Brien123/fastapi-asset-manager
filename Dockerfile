@@ -1,7 +1,7 @@
-FROM python:3.12-slim as builder
+FROM python:3.12-slim AS builder
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 RUN addgroup --system app && adduser --system --group app
 
@@ -11,10 +11,10 @@ ENV PATH="/venv/bin:$PATH"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-FROM python:3.12-slim
+FROM python:3.12-slim AS final
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 RUN addgroup --system app && adduser --system --group app
 
@@ -22,7 +22,6 @@ COPY --from=builder /venv /venv
 
 WORKDIR /app
 COPY . /app
-
 RUN chown -R app:app /app
 
 USER app
