@@ -1,7 +1,7 @@
 from typing import Optional, List, Dict
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from app.models import AssetType, TransactionType
+from app.models import AssetType, TransactionType, UserRole
 
 class Token(BaseModel):
     access_token: str
@@ -16,10 +16,12 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    role: UserRole = UserRole.USER
 
 class User(UserBase):
     id: int
     created_at: datetime
+    role: UserRole
     
     class Config:
         orm_mode = True
@@ -38,7 +40,7 @@ class AssetBase(BaseModel):
     value: float
 
 class AssetCreate(AssetBase):
-    pass
+    owner_id: int
 
 class Asset(AssetBase):
     id: int
@@ -59,20 +61,26 @@ class PaginatedAssetResponse(BaseModel):
 class ReportResponse(BaseModel):
     total_assets: int
     total_asset_value: float
+    average_asset_value: float
     recent_transactions: int
     transaction_types_distribution: Dict[TransactionType, int]
+    asset_types_distribution: Dict[AssetType, int]
+    most_valuable_asset: Optional[Asset] = None
 
-class TransactionBase(BaseModel):
+class TransactionCreate(BaseModel):
+    asset_id: int
+    to_user_id: int
+    type: TransactionType
+    amount: Optional[float] = 0.0
+
+class Transaction(BaseModel):
+    id: int
     amount: float
     type: TransactionType
     asset_id: int
-
-class TransactionCreate(TransactionBase):
-    pass
-
-class Transaction(TransactionBase):
-    id: int
     user_id: int
+    from_owner_id: int
+    to_owner_id: int
     timestamp: datetime
     
     class Config:

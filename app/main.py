@@ -1,8 +1,28 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import users, assets, transactions, reports, analytics, auth
-from app.database import engine
-from app.models import Base
+from app.database import engine, SessionLocal
+from app.models import Base, User, UserRole
+from app.routers.auth import get_password_hash
+
+def create_default_admin_on_startup():
+    db = SessionLocal()
+    try:
+        admin_user = db.query(User).filter(User.username == "admin").first()
+        if not admin_user:
+            hashed_password = get_password_hash("12345678")
+            default_admin = User(
+                username="admin",
+                email="admin@test.com",
+                hashed_password=hashed_password,
+                role=UserRole.ADMIN
+            )
+            db.add(default_admin)
+            db.commit()
+            print("INFO:     Default admin user 'admin' created.")
+    finally:
+        db.close()
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -11,6 +31,10 @@ app = FastAPI(
     description="Backend API for Codexbase Network hiring process",
     version="1.0.0",
 )
+
+@app.on_event("startup")
+async def startup_event():
+    create_default_admin_on_startup()
 
 # CORS middleware
 app.add_middleware(

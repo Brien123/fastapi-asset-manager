@@ -4,8 +4,8 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from app.schemas import TokenData, UserLogin, Token
-from app.models import User
+from app.schemas import TokenData, UserLogin, Token, User as UserSchema
+from app.models import User, UserRole
 from sqlalchemy.orm import Session
 from app.database import get_db
 import os
@@ -55,6 +55,14 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     if user is None:
         raise credentials_exception
     return user
+
+async def get_current_admin_user(current_user: UserSchema = Depends(get_current_user)):
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The user doesn't have enough privileges"
+        )
+    return current_user
 
 def _get_token_for_user(username: str, password: str, db: Session):
     """Helper function to authenticate user and create JWT token."""

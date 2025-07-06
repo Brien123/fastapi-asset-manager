@@ -1,12 +1,12 @@
 # Codexbase Network API
 
-This is the backend API for the Codexbase Network hiring process, built with FastAPI. It provides a comprehensive solution for managing users, financial assets, and transactions, along with reporting and analytics features.
+This is the backend API for the Codexbase Network hiring process, built with FastAPI. It provides a comprehensive, admin-centric solution for managing users, financial assets, and transactions, along with reporting and analytics features.
 
 ## Features
 
-* **User Authentication**: Secure user registration and JWT-based authentication.
-* **Asset Management**: Create and list financial assets (Stocks, Crypto, Real Estate).
-* **Transaction Tracking**: Log buy, sell, and transfer transactions, with automatic asset value updates.
+* **Admin-Centric Control**: All operations, including user and asset management, are restricted to admin users.
+* **Role-Based Access**: Secure JWT-based authentication with a distinction between `admin` and `user` roles.
+* **Full Asset & Transaction Management**: Admins can create users, create assets for users, and facilitate `sell` or `transfer` transactions between users.
 * **Paginated Responses**: Efficiently browse large sets of data for assets and users.
 * **Reporting & Analytics**: Endpoints for generating summary reports and data for graphical visualization.
 * **Interactive API Docs**: Automatic, interactive API documentation powered by Swagger UI.
@@ -99,17 +99,18 @@ Once the server is running, you can access the interactive API documentation in 
 
 This UI allows you to test all API endpoints directly from your browser.
 
-## First Step: Create a User
+## First Step: Use the Default Admin User
 
-Before using any authenticated routes, create a user using the `/users` route. Example request body:
+The system is admin-only. On first startup, the application automatically creates a default admin user with the following credentials:
 
-```json
-{
-  "username": "test",
-  "email": "test@test.com",
-  "password": "12345678"
-}
-```
+- **Username**: `admin`
+- **Password**: `12345678`
+
+You can use these credentials to authenticate and begin using the API.
+
+### Creating Users (Admin Task)
+
+Admins can create new users (with either `admin` or `user` roles) via the `POST /users/` endpoint.
 
 ### Authorizing in the Docs
 
@@ -121,59 +122,19 @@ To access protected endpoints that show a lock icon, you need to authorize your 
 
 ### Using External Clients (Postman, cURL)
 
-If you prefer to use an external API client, you need to manually acquire and use the JWT token:
-
-1. Make a `POST` request to the `/auth/` endpoint with a JSON body containing your `username` and `password`.
-2. The API will respond with an `access_token`.
-3. For all subsequent requests to protected endpoints, include this token in the `Authorization` header as a Bearer token:
+1.  Make a `POST` request to the `/auth/` endpoint with your admin `username` and `password`.
+2.  The API will respond with an `access_token`.
+3.  For all subsequent requests, include this token in the `Authorization` header:
 
    ```
    Authorization: Bearer <your_access_token>
    ```
 
-## API Endpoints Overview
+## API Endpoints Overview (Admin Only)
 
-Here is a summary of the available API endpoints.
-
-### Authentication (`/auth`)
-
-* **`POST /auth/token`**: Authenticates a user and returns a JWT access token.
-
-### Users (`/users`)
-
-* **`POST /users/`**: Creates a new user.
-* **`GET /users/`**: Lists all users (requires authentication).
-
-### Assets (`/assets`)
-
-* **`POST /assets/`**: Creates a new asset for the authenticated user.
-
-  * **Sample Body**:
-
-    ```json
-    {
-      "name": "Bitcoin",
-      "type": "crypto",
-      "value": 65000.00
-    }
-    ```
-* **`GET /assets/`**: Lists all assets for the authenticated user with pagination.
-
-### Transactions (`/transactions`)
-
-* **`POST /transactions/`**: Creates a new transaction and updates the corresponding asset's value.
-
-  * **Sample Body**:
-
-    ```json
-    {
-      "amount": 1000,
-      "type": "buy",
-      "asset_id": 1
-    }
-    ```
-
-### Reports & Analytics
-
-* **`GET /reports/`**: Provides a summary report for the authenticated user.
-* **`GET /analytics/graphs`**: Provides structured data ready for plotting graphs.
+*   **Authentication (`/auth`)**: Get a JWT for an admin user.
+*   **Users (`/users`)**: Create and list all users.
+*   **Assets (`/assets`)**: Create assets and assign them to users. List all assets.
+*   **Transactions (`/transactions`)**: Facilitate `sell` or `transfer` of assets between users.
+*   **Reports (`/reports`)**: Get a high-level summary report of the entire platform.
+*   **Analytics (`/analytics`)**: Get time-series data for platform-wide metrics.
