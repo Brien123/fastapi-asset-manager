@@ -194,8 +194,9 @@ Endpoint for logging financial transactions.
   ```json
   {
     "amount": 250.5,
-    "type": "buy",
-    "asset_id": 1
+    "type": "sell",
+    "asset_id": 1,
+    "to_user_id": 2
   }
   ```
 - **Successful Response (201 Created)**: Returns the newly created transaction object.
@@ -212,7 +213,7 @@ Endpoint for logging financial transactions.
     -H 'Content-Type: application/json' \
     -d '{
       "amount": 250.50,
-      "type": "buy",
+      "type": "sell",
       "asset_id": 1,
       "to_user_id": 2
     }'
