@@ -22,10 +22,9 @@ def get_platform_graph_data(
             detail="start_date cannot be after end_date."
         )
 
-    # Define reusable column expressions for casting to Date
-    user_date_col = func.strftime('%Y-%m-%d', User.created_at)
-    asset_date_col = func.strftime('%Y-%m-%d', Asset.created_at)
-    transaction_date_col = func.strftime('%Y-%m-%d', Transaction.timestamp)
+    user_date_col = cast(User.created_at, Date)
+    asset_date_col = cast(Asset.created_at, Date)
+    transaction_date_col = cast(Transaction.timestamp, Date)
 
     # User growth data
     user_growth_query = db.query(
@@ -33,17 +32,17 @@ def get_platform_graph_data(
         func.count(User.id).label("count")
     )
     if start_date:
-        user_growth_query = user_growth_query.filter(user_date_col >= start_date.isoformat())
+        user_growth_query = user_growth_query.filter(user_date_col >= start_date)
     if end_date:
-        user_growth_query = user_growth_query.filter(user_date_col <= end_date.isoformat())
+        user_growth_query = user_growth_query.filter(user_date_col <= end_date)
     user_growth = user_growth_query.group_by(user_date_col).order_by(user_date_col).all()
 
     # Base query for platform assets with date filters
     platform_asset_query = db.query(Asset)
     if start_date:
-        platform_asset_query = platform_asset_query.filter(asset_date_col >= start_date.isoformat())
+        platform_asset_query = platform_asset_query.filter(asset_date_col >= start_date)
     if end_date:
-        platform_asset_query = platform_asset_query.filter(asset_date_col <= end_date.isoformat())
+        platform_asset_query = platform_asset_query.filter(asset_date_col <= end_date)
     
     platform_total_asset_value_by_date = platform_asset_query.with_entities(
         asset_date_col.label("date"),
@@ -59,9 +58,9 @@ def get_platform_graph_data(
     # Base query for platform transactions with date filters
     platform_transaction_query = db.query(Transaction)
     if start_date:
-        platform_transaction_query = platform_transaction_query.filter(transaction_date_col >= start_date.isoformat())
+        platform_transaction_query = platform_transaction_query.filter(transaction_date_col >= start_date)
     if end_date:
-        platform_transaction_query = platform_transaction_query.filter(transaction_date_col <= end_date.isoformat())
+        platform_transaction_query = platform_transaction_query.filter(transaction_date_col <= end_date)
 
     platform_transaction_volume = platform_transaction_query.with_entities(
         transaction_date_col.label("date"),
@@ -75,24 +74,24 @@ def get_platform_graph_data(
 
     return {
         "user_growth": {
-            "dates": [item.date for item in user_growth],
+            "dates": [item.date.isoformat() for item in user_growth],
             "counts": [item.count for item in user_growth]
         },
         "asset_distribution": {
             "types": [item.type.value for item in platform_asset_distribution],
             "counts": [item.count for item in platform_asset_distribution],
-            "values": [float(item.total_value or 0) for item in platform_asset_distribution]
+            "values": [round(float(item.total_value or 0), 2) for item in platform_asset_distribution]
         },
         "transaction_volume": {
-            "dates": [item.date for item in platform_transaction_volume],
-            "volumes": [float(item.volume or 0) for item in platform_transaction_volume]
+            "dates": [item.date.isoformat() for item in platform_transaction_volume],
+            "volumes": [round(float(item.volume or 0), 2) for item in platform_transaction_volume]
         },
         "total_asset_value_by_date": {
-            "dates": [item.date for item in platform_total_asset_value_by_date],
+            "dates": [item.date.isoformat() for item in platform_total_asset_value_by_date],
             "values": [round(float(item.total_value or 0), 2) for item in platform_total_asset_value_by_date]
         },
         "average_transaction_size_by_date": {
-            "dates": [item.date for item in platform_average_transaction_size_by_date],
+            "dates": [item.date.isoformat() for item in platform_average_transaction_size_by_date],
             "avg_sizes": [round(float(item.avg_size or 0), 2) for item in platform_average_transaction_size_by_date]
         },
     }
