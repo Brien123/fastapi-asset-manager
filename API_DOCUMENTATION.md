@@ -156,7 +156,8 @@ Endpoints for managing all financial assets on the platform. **Admin access is r
     -d '{
       "name": "Apple Inc.",
       "type": "stock",
-      "value": 1500.75
+      "value": 1500.75,
+      "owner_id": 0
     }'
   ```
 
