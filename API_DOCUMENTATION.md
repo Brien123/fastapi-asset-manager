@@ -213,7 +213,8 @@ Endpoint for logging financial transactions.
     -d '{
       "amount": 250.50,
       "type": "buy",
-      "asset_id": 1
+      "asset_id": 1,
+      "to_user_id": 2
     }'
   ```
 
