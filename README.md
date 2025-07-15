@@ -1,6 +1,6 @@
-# Codexbase Network API
+# API DOCUMENTATION
 
-This is the backend API for the Codexbase Network hiring process, built with FastAPI. It provides a comprehensive, admin-centric solution for managing users, financial assets, and transactions, along with reporting and analytics features.
+This built with FastAPI. It provides a comprehensive, admin-centric solution for managing users, financial assets, and transactions, along with reporting and analytics features.
 
 ## Features
 
@@ -87,8 +87,8 @@ The API will be available at `http://127.0.0.1:8000`.
 Alternatively, you can build and run the project using Docker:
 
 ```bash
-docker build -t codexbase .
-docker run -d -p 8000:8000 codexbase
+docker build -t asset_manager .
+docker run -d -p 8000:8000 asset_manager
 ```
 
 The API will be accessible at `http://localhost:8000`.

@@ -27,8 +27,8 @@ def create_default_admin_on_startup():
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Codexbase Network API",
-    description="Backend API for Codexbase Network hiring process",
+    title="FastAPI Asset Management Backend",
+    description="Asset Management Backend",
     version="1.0.0",
 )
 

@@ -1,6 +1,6 @@
-# Codexbase Network API Documentation
+# API Documentation
 
-This document provides a detailed guide on how to use and test each endpoint of the Codexbase Network API.
+This document provides a detailed guide on how to use and test each endpoint of the API.
 
 ### Testing without Local Setup
 
